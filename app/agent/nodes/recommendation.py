@@ -12,7 +12,7 @@ async def recommendation_node(state: AgentState) -> dict:
     model = get_chat_model(temperature=0.4)
     tools = [search_products]
 
-    agent = create_react_agent(model, tools, state_modifier=RECOMMENDATION_AGENT_SYSTEM_PROMPT)
+    agent = create_react_agent(model, tools, prompt=RECOMMENDATION_AGENT_SYSTEM_PROMPT)
     result = await agent.ainvoke({"messages": state["messages"]})
     
     new_messages = result["messages"][len(state["messages"]) :]

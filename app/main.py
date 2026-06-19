@@ -1,6 +1,7 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
+import structlog
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
@@ -12,7 +13,6 @@ from app.core.exceptions import AppException
 from app.core.logging import configure_logging
 from app.middleware.correlation_id import CorrelationIdMiddleware
 from app.middleware.request_logger import RequestLoggerMiddleware
-import structlog
 
 settings = get_settings()
 logger = structlog.get_logger(__name__)
@@ -42,22 +42,26 @@ app.add_middleware(RequestLoggerMiddleware)
 app.add_middleware(CorrelationIdMiddleware)
 
 # CORS configuration
-if settings.ALLOWED_ORIGINS:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[str(origin) for origin in settings.ALLOWED_ORIGINS],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+cors_origins: list[str] = [str(origin).rstrip("/") for origin in settings.ALLOWED_ORIGINS]
+if not cors_origins and settings.APP_ENV == "development":
+    cors_origins = ["http://localhost:4200", "http://127.0.0.1:4200"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Include routers
-app.include_router(api_router, prefix="/v1")
+app.include_router(api_router, prefix="/api/v1")
 
 
 # ---------------------------------------------------------------------------
 # Global exception handlers
 # ---------------------------------------------------------------------------
+
 
 @app.exception_handler(AppException)
 async def app_exception_handler(request: Request, exc: AppException) -> JSONResponse:
@@ -103,9 +107,11 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
 # Health check
 # ---------------------------------------------------------------------------
 
+
 @app.get("/health", tags=["health"])
 async def health_check() -> dict:
     from app.schemas.common import ApiResponse
+
     response = ApiResponse.success(
         data={"status": "ok", "service": "ai-assistant"},
         message="Service is healthy",

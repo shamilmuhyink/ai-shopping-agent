@@ -90,7 +90,7 @@ class ChatService:
                 yield json.dumps(
                     {
                         "event_type": "token",
-                        "data": {"token": word + " "},
+                        "data": {"text": word + " "},
                         "conversation_id": str(conversation.id),
                     }
                 )

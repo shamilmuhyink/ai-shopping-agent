@@ -10,7 +10,7 @@ def get_chat_model(temperature: float = 0.3) -> ChatGroq:
     """
     return ChatGroq(
         api_key=settings.GROQ_API_KEY,
-        model="llama3-8b-8192", # Defaulting to an open-weight Llama 3 model on Groq
+        model="llama-3.1-8b-instant", # Defaulting to an open-weight Llama 3.1 model on Groq
         temperature=temperature,
         max_tokens=1024,
     )

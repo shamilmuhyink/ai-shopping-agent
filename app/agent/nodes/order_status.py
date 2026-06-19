@@ -15,7 +15,7 @@ async def order_agent_node(state: AgentState) -> dict:
     tools = [get_order_status]
 
     # We use LangGraph's prebuilt react agent for tool calling
-    agent = create_react_agent(model, tools, state_modifier=ORDER_AGENT_SYSTEM_PROMPT)
+    agent = create_react_agent(model, tools, prompt=ORDER_AGENT_SYSTEM_PROMPT)
 
     # Run the agent with the current messages
     result = await agent.ainvoke({"messages": state["messages"]})

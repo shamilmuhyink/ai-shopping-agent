@@ -16,6 +16,7 @@ from app.clients.groq_client import get_chat_model
 async def general_agent_node(state: AgentState) -> dict:
     model = get_chat_model()
     from langchain_core.messages import SystemMessage
+
     messages = [SystemMessage(content=GENERAL_AGENT_SYSTEM_PROMPT)] + state["messages"]
     response = await model.ainvoke(messages)
     return {"messages": [response]}
@@ -48,7 +49,14 @@ def build_graph() -> StateGraph:
     )
 
     # All specialized agents flow into the response formatter
-    for node in ["order_status", "product_search", "returns", "recommendation", "escalation", "general"]:
+    for node in [
+        "order_status",
+        "product_search",
+        "returns",
+        "recommendation",
+        "escalation",
+        "general",
+    ]:
         workflow.add_edge(node, "response_formatter")
 
     workflow.add_edge("response_formatter", END)
@@ -59,4 +67,3 @@ def build_graph() -> StateGraph:
 
 
 app_graph = build_graph()
-
