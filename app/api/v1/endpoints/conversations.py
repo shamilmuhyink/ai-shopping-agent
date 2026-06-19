@@ -2,8 +2,8 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends
 
-from app.core.security import verify_service_token
 from app.core.exceptions import AppException
+from app.core.security import verify_service_token
 from app.schemas.common import ApiResponse
 from app.schemas.conversation import ConversationResponse
 from app.services.memory_service import memory_service
