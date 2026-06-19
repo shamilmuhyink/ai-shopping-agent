@@ -12,7 +12,7 @@ from app.models.conversation import Conversation, Message
 
 
 class ChatService:
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
     async def get_or_create_conversation(self, conversation_id: UUID | None) -> Conversation:
