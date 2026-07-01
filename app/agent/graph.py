@@ -18,8 +18,13 @@ async def general_agent_node(state: AgentState) -> dict:
     from langchain_core.messages import SystemMessage
 
     messages = [SystemMessage(content=GENERAL_AGENT_SYSTEM_PROMPT)] + state["messages"]
-    response = await model.ainvoke(messages)
-    return {"messages": [response]}
+    
+    # Use astream to trigger on_chat_model_stream events globally
+    response_content = ""
+    async for chunk in model.astream(messages):
+        response_content += chunk.content
+        
+    return {"messages": [AIMessage(content=response_content)]}
 
 
 def build_graph() -> StateGraph:

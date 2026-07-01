@@ -1,4 +1,4 @@
-from collections.abc import List
+from typing import List
 from uuid import UUID
 
 from sqlalchemy import select

@@ -72,28 +72,22 @@ class ChatService:
         )
 
         final_response_text = ""
-
+        
         try:
-            # In a real streaming scenario, we'd use app_graph.astream_events
-            # Here we just run it and stream the final output text
-            result_state = await app_graph.ainvoke(initial_state)
-
-            last_message = result_state["messages"][-1]
-            if isinstance(last_message, AIMessage):
-                final_response_text = str(last_message.content)
-            else:
-                final_response_text = "I'm sorry, I couldn't process that request."
-
-            # Simulate streaming words
-            words = final_response_text.split(" ")
-            for word in words:
-                yield json.dumps(
-                    {
-                        "event_type": "token",
-                        "data": {"text": word + " "},
-                        "conversation_id": str(conversation.id),
-                    }
-                )
+            # Stream tokens from the model in real time using astream_events
+            async for event in app_graph.astream_events(initial_state, version="v2"):
+                if event["event"] == "on_chat_model_stream":
+                    chunk = event["data"].get("chunk")
+                    if chunk and hasattr(chunk, "content") and chunk.content:
+                        token = chunk.content
+                        final_response_text += token
+                        yield json.dumps(
+                            {
+                                "event_type": "token",
+                                "data": {"text": token},
+                                "conversation_id": str(conversation.id),
+                            }
+                        )
 
         except Exception as e:
             final_response_text = f"Error processing request: {str(e)}"
