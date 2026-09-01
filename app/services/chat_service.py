@@ -72,7 +72,7 @@ class ChatService:
         )
 
         final_response_text = ""
-        
+
         try:
             # Stream tokens from the model in real time using astream_events
             async for event in app_graph.astream_events(initial_state, version="v2"):

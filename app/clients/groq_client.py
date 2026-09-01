@@ -1,7 +1,9 @@
 from langchain_groq import ChatGroq
+
 from app.core.config import get_settings
 
 settings = get_settings()
+
 
 def get_chat_model(temperature: float = 0.3) -> ChatGroq:
     """
@@ -10,7 +12,7 @@ def get_chat_model(temperature: float = 0.3) -> ChatGroq:
     """
     return ChatGroq(
         api_key=settings.GROQ_API_KEY,
-        model="llama-3.1-8b-instant", # Defaulting to an open-weight Llama 3.1 model on Groq
+        model="llama-3.1-8b-instant",  # Defaulting to an open-weight Llama 3.1 model on Groq
         temperature=temperature,
         max_tokens=1024,
     )

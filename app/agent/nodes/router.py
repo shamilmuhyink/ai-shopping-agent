@@ -15,7 +15,7 @@ async def route_message(state: AgentState) -> dict:
     response = await model.ainvoke(messages)
     decision = response.content.strip().lower()
 
-    valid_agents = ["order_status", "product_search", "returns", "general"]
+    valid_agents = ["order_status", "product_search", "recommendation", "returns", "general"]
     if decision not in valid_agents:
         decision = "general"
 

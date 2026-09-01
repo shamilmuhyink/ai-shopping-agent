@@ -1,4 +1,5 @@
 from langchain_core.messages import AIMessage
+from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, StateGraph
 
 from app.agent.nodes.escalation import escalation_node
@@ -13,17 +14,17 @@ from app.agent.state import AgentState
 from app.clients.groq_client import get_chat_model
 
 
-async def general_agent_node(state: AgentState) -> dict:
+async def general_agent_node(state: AgentState, config: RunnableConfig) -> dict:
     model = get_chat_model()
     from langchain_core.messages import SystemMessage
 
     messages = [SystemMessage(content=GENERAL_AGENT_SYSTEM_PROMPT)] + state["messages"]
-    
+
     # Use astream to trigger on_chat_model_stream events globally
     response_content = ""
-    async for chunk in model.astream(messages):
+    async for chunk in model.astream(messages, config):
         response_content += chunk.content
-        
+
     return {"messages": [AIMessage(content=response_content)]}
 
 
